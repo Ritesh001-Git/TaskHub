@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskHub - Task Tracking & Collaboration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .task-form {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+
+        .task-form h2 {
+            margin-bottom: 20px;
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #718096;
+            margin-left: 10px;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+        }
+
+        .tasks-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .tasks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .tasks-header h2 {
+            color: #4a5568;
+            font-size: 1.5rem;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-group select {
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-card.pending {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        .stat-card.completed {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .stat-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .task-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .task-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .task-item.completed {
+            background: #f7fafc;
+            border-color: #48bb78;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .task-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .task-item.completed .task-title {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #718096;
+        }
+
+        .priority-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .priority-medium {
+            background: #feebc8;
+            color: #dd6b20;
+        }
+
+        .priority-low {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .task-description {
+            margin-bottom: 15px;
+            color: #4a5568;
+            line-height: 1.5;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .empty-state img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .task-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .task-actions {
+                flex-wrap: wrap;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>TaskHub</h1>
+            <p>Collaborate, Track, and Achieve Together</p>
+        </div>
+
+        <div class="main-content">
+            <div class="task-form">
+                <h2 id="form-title">Create New Task</h2>
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="title">Task Title *</label>
+                        <input type="text" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" placeholder="Describe the task details..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="assignee">Assigned To</label>
+                        <input type="text" id="assignee" name="assignee" placeholder="Team member name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="priority">Priority</label>
+                        <select id="priority" name="priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dueDate">Due Date</label>
+                        <input type="date" id="dueDate" name="dueDate">
+                    </div>
+                    
+                    <button type="submit" class="btn" id="submit-btn">Create Task</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-btn" style="display: none;">Cancel</button>
+                </form>
+            </div>
+
+            <div class="tasks-section">
+                <div class="tasks-header">
+                    <h2>Tasks</h2>
+                    <div class="filter-group">
+                        <select id="statusFilter">
+                            <option value="all">All Tasks</option>
+                            <option value="pending">Pending</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                        <select id="priorityFilter">
+                            <option value="all">All Priorities</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <h3 id="total-tasks">0</h3>
+                        <p>Total Tasks</p>
+                    </div>
+                    <div class="stat-card pending">
+                        <h3 id="pending-tasks">0</h3>
+                        <p>Pending</p>
+                    </div>
+                    <div class="stat-card completed">
+                        <h3 id="completed-tasks">0</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+
+                <div id="task-list" class="task-list">
+                    <div class="empty-state">
+                        <h3>No tasks yet!</h3>
+                        <p>Create your first task to get started with TaskHub</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Confirm Delete</h3>
+                <button class="close-btn" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <p>Are you sure you want to delete this task? This action cannot be undone.</p>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TaskHub {
+            constructor() {
+                this.tasks = [];
+                this.currentEditId = null;
+                this.deleteTaskId = null;
+                this.taskIdCounter = 1;
+                
+                this.initializeEventListeners();
+                this.updateDisplay();
+            }
+
+            initializeEventListeners() {
+                // Form submission
+                document.getElementById('taskForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleTaskSubmission();
+                });
+
+                // Cancel button
+                document.getElementById('cancel-btn').addEventListener('click', () => {
+                    this.cancelEdit();
+                });
+
+                // Filters
+                document.getElementById('statusFilter').addEventListener('change', () => {
+                    this.filterTasks();
+                });
+
+                document.getElementById('priorityFilter').addEventListener('change', () => {
+                    this.filterTasks();
+                });
+
+                // Set minimum date to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('dueDate').setAttribute('min', today);
+            }
+
+            handleTaskSubmission() {
+                const formData = new FormData(document.getElementById('taskForm'));
+                const taskData = {
+                    title: formData.get('title').trim(),
+                    description: formData.get('description').trim(),
+                    assignee: formData.get('assignee').trim(),
+                    priority: formData.get('priority'),
+                    dueDate: formData.get('dueDate'),
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+
+                if (!taskData.title) {
+                    alert('Task title is required!');
+                    return;
+                }
+
+                if (this.currentEditId) {
+                    this.updateTask(this.currentEditId, taskData);
+                } else {
+                    this.createTask(taskData);
+                }
+
+                this.resetForm();
+                this.updateDisplay();
+            }
+
+            createTask(taskData) {
+                const task = {
+                    id: this.taskIdCounter++,
+                    ...taskData
+                };
+                this.tasks.unshift(task);
+            }
+
+            updateTask(id, updatedData) {
+                const index = this.tasks.findIndex(task => task.id === id);
+                if (index !== -1) {
+                    this.tasks[index] = { ...this.tasks[index], ...updatedData };
+                }
+            }
+
+            deleteTask(id) {
+                this.tasks = this.tasks.filter(task => task.id !== id);
+                this.updateDisplay();
+            }
+
+            toggleTaskCompletion(id) {
+                const task = this.tasks.find(task => task.id === id);
+                if (task) {
+                    task.completed = !task.completed;
+                    this.updateDisplay();
+                }
+            }
+
+            editTask(id) {
+                const task = this.tasks.find(task => task.id === id);
+                if (!task) return;
+
+                this.currentEditId = id;
+                
+                // Populate form
+                document.getElementById('title').value = task.title;
+                document.getElementById('description').value = task.description || '';
+                document.getElementById('assignee').value = task.assignee || '';
+                document.getElementById('priority').value = task.priority;
+                document.getElementById('dueDate').value = task.dueDate || '';
+
+                // Update form UI
+                document.getElementById('form-title').textContent = 'Edit Task';
+                document.getElementById('submit-btn').textContent = 'Update Task';
+                document.getElementById('cancel-btn').style.display = 'inline-block';
+
+                // Scroll to form
+                document.querySelector('.task-form').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            cancelEdit() {
+                this.currentEditId = null;
+                this.resetForm();
+            }
+
+            resetForm() {
+                document.getElementById('taskForm').reset();
+                document.getElementById('form-title').textContent = 'Create New Task';
+                document.getElementById('submit-btn').textContent = 'Create Task';
+                document.getElementById('cancel-btn').style.display = 'none';
+                this.currentEditId = null;
+            }
+
+            filterTasks() {
+                const statusFilter = document.getElementById('statusFilter').value;
+                const priorityFilter = document.getElementById('priorityFilter').value;
+
+                let filteredTasks = this.tasks;
+
+                if (statusFilter !== 'all') {
+                    filteredTasks = filteredTasks.filter(task => {
+                        return statusFilter === 'completed' ? task.completed : !task.completed;
+                    });
+                }
+
+                if (priorityFilter !== 'all') {
+                    filteredTasks = filteredTasks.filter(task => task.priority === priorityFilter);
+                }
+
+                this.renderTasks(filteredTasks);
+            }
+
+            updateDisplay() {
+                this.updateStats();
+                this.filterTasks();
+            }
+
+            updateStats() {
+                const total = this.tasks.length;
+                const completed = this.tasks.filter(task => task.completed).length;
+                const pending = total - completed;
+
+                document.getElementById('total-tasks').textContent = total;
+                document.getElementById('pending-tasks').textContent = pending;
+                document.getElementById('completed-tasks').textContent = completed;
+            }
+
+            renderTasks(tasks) {
+                const taskList = document.getElementById('task-list');
+
+                if (tasks.length === 0) {
+                    taskList.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No tasks found!</h3>
+                            <p>Try adjusting your filters or create a new task</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                taskList.innerHTML = tasks.map(task => this.createTaskHTML(task)).join('');
+            }
+
+            createTaskHTML(task) {
+                const dueDate = task.dueDate ? new Date(task.dueDate) : null;
+                const isOverdue = dueDate && dueDate < new Date() && !task.completed;
+                const dueDateText = dueDate ? dueDate.toLocaleDateString() : 'No due date';
+
+                return `
+                    <div class="task-item ${task.completed ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
+                        <div class="task-header">
+                            <div>
+                                <div class="task-title">${this.escapeHtml(task.title)}</div>
+                                <div class="task-meta">
+                                    <span>📅 ${dueDateText}</span>
+                                    ${task.assignee ? `<span>👤 ${this.escapeHtml(task.assignee)}</span>` : ''}
+                                    <span class="priority-badge priority-${task.priority}">
+                                        ${task.priority.toUpperCase()}
+                                    </span>
+                                    ${isOverdue ? '<span style="color: #e53e3e; font-weight: 600;">⚠️ OVERDUE</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                        ${task.description ? `<div class="task-description">${this.escapeHtml(task.description)}</div>` : ''}
+                        <div class="task-actions">
+                            <button class="btn btn-small ${task.completed ? 'btn-secondary' : ''}" 
+                                    onclick="taskHub.toggleTaskCompletion(${task.id})">
+                                ${task.completed ? '↶ Reopen' : '✓ Complete'}
+                            </button>
+                            <button class="btn btn-small btn-secondary" 
+                                    onclick="taskHub.editTask(${task.id})">
+                                ✏️ Edit
+                            </button>
+                            <button class="btn btn-small btn-danger" 
+                                    onclick="taskHub.showDeleteModal(${task.id})">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            showDeleteModal(id) {
+                this.deleteTaskId = id;
+                document.getElementById('deleteModal').style.display = 'block';
+            }
+
+            escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+        }
+
+        // Global functions for modal
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            taskHub.deleteTaskId = null;
+        }
+
+        function confirmDelete() {
+            if (taskHub.deleteTaskId) {
+                taskHub.deleteTask(taskHub.deleteTaskId);
+                closeDeleteModal();
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target === modal) {
+                closeDeleteModal();
+            }
+        }
+
+        // Initialize the app
+        const taskHub = new TaskHub();
+
+        // Add some sample data for demonstration
+        taskHub.tasks = [
+            {
+                id: 1,
+                title: "Complete Project Proposal",
+                description: "Draft and finalize the project proposal for the new client including timeline and budget estimates",
+                assignee: "Sarah Johnson",
+                priority: "high",
+                dueDate: "2025-08-10",
+                completed: false,
+                createdAt: "2025-08-05T10:00:00.000Z"
+            },
+            {
+                id: 2,
+                title: "Team Meeting Preparation",
+                description: "Prepare agenda and materials for the weekly team standup",
+                assignee: "Mike Chen",
+                priority: "medium",
+                dueDate: "2025-08-07",
+                completed: true,
+                createdAt: "2025-08-04T14:30:00.000Z"
+            },
+            {
+                id: 3,
+                title: "Update Documentation",
+                description: "Review and update the API documentation with new endpoints",
+                assignee: "",
+                priority: "low",
+                dueDate: "",
+                completed: false,
+                createdAt: "2025-08-03T09:15:00.000Z"
+            }
+        ];
+        taskHub.taskIdCounter = 4;
+        taskHub.updateDisplay();
+    </script>
+</body>
+</html>
