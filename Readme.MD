@@ -21,3 +21,41 @@ This README explains the steps and details for deploying a static web applicatio
    - Select your region
    - Select **Other** for deployment source (since we will configure GitHub manually)
 4. After creation, copy the **Deployment Token** (also called `azure_static_web_apps_api_token`)
+
+### 2. Add the Token to GitHub Secrets
+
+1. Go to your GitHub repository
+2. Click on **Settings** > **Secrets and variables** > **Actions**
+3. Add a new secret:
+   - Name: `AZURE_STATIC_WEB_APPS_API_TOKEN_PROUD_TREE_0F206FD00`
+   - Value: *Paste your deployment token here*
+
+### 3. Create GitHub Workflow
+
+Inside your project, create a `.github/workflows/azure-deploy.yml` file and add the following:
+
+```yaml
+name: Build And Deploy
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build And Deploy
+        id: builddeploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_PROUD_TREE_0F206FD00 }}
+          action: "upload"
+          app_location: "/" # App source code path
+          api_location: ""  # API path if any
+          output_location: "/" # Build output directory
+          skip_app_build: true
+          github_id_token: ${{ steps.idtoken.outputs.result }}
+```
