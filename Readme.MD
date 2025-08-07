@@ -59,3 +59,21 @@ jobs:
           skip_app_build: true
           github_id_token: ${{ steps.idtoken.outputs.result }}
 ```
+
+### 4. Commit and Push
+
+Push your code to the `main` branch. GitHub Actions will trigger the workflow and deploy your app.
+
+### 5. Verify Deployment
+
+- Visit the **URL** provided by Azure Static Web Apps.
+- You should see your deployed static website.
+
+## 📘 Notes
+
+- If you have a frontend build process (e.g., React, Vue), set `skip_app_build` to `false` and specify the correct `output_location`.
+- You can connect a custom domain via the Azure Portal.
+
+---
+
+© 2025 - Deployment via Azure Static Web Apps + GitHub Actions.
