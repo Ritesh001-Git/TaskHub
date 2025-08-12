@@ -26,9 +26,6 @@ This README explains the steps and details for deploying a static web applicatio
 
 1. Go to your GitHub repository
 2. Click on **Settings** > **Secrets and variables** > **Actions**
-3. Add a new secret:
-   - Name: `AZURE_STATIC_WEB_APPS_API_TOKEN_PROUD_TREE_0F206FD00`
-   - Value: *Paste your deployment token here*
 
 ### 3. Create GitHub Workflow
 
